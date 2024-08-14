@@ -1,6 +1,12 @@
 "use client";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { InputAdornment, OutlinedInput } from "@mui/material";
+import {
+  FormControlLabel,
+  InputAdornment,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -9,15 +15,22 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { useDispatch } from "react-redux";
+import { userSignupAction } from "../../../redux/actions/asyncAuthAction";
 
 const SignUp = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [signupFormData, setSignupFormData] = useState({
+    role: "",
     name: "",
-    email: "",
+    emailId: "",
+    contactNumber: "",
     password: "",
   });
 
@@ -28,17 +41,20 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const response = await dispatch(userSignupAction(signupFormData));
-    // const status = response?.type?.split("/")[1];
-    // if (status === "fulfilled") {
-    //   navigate("/login");
-    // }
-    setSignupFormData({
-      name: "",
-      email: "",
-      mobile: "",
-      password: "",
-    });
+
+    const response = await dispatch(userSignupAction(signupFormData));
+
+    const status = response?.type?.split("/")[1];
+    if (status === "fulfilled") {
+      router.push("/auth/login");
+      setSignupFormData({
+        role: "",
+        name: "",
+        emailId: "",
+        contactNumber: "",
+        password: "",
+      });
+    }
   };
 
   return (
@@ -86,6 +102,29 @@ const SignUp = () => {
             onSubmit={handleSubmit}
             sx={{ mt: 1 }}
           >
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="role"
+              onChange={handleChange}
+            >
+              <FormControlLabel
+                value="user"
+                control={<Radio color="success" />}
+                label="User"
+              />
+              <FormControlLabel
+                value="admin"
+                control={<Radio color="success" />}
+                label="Admin"
+              />
+              <FormControlLabel
+                value="organization"
+                control={<Radio color="success" />}
+                label="Organization"
+              />
+            </RadioGroup>
+
             <Typography variant="h6">Name</Typography>
             <OutlinedInput
               id="name"
@@ -101,8 +140,21 @@ const SignUp = () => {
 
             <Typography variant="h6">Email</Typography>
             <OutlinedInput
-              id="email"
-              name="email"
+              id="emailId"
+              name="emailId"
+              fullWidth
+              onChange={handleChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <MdEmail size="1.2rem" />
+                </InputAdornment>
+              }
+            />
+
+            <Typography variant="h6">Contact</Typography>
+            <OutlinedInput
+              id="contactNumber"
+              name="contactNumber"
               fullWidth
               onChange={handleChange}
               startAdornment={
