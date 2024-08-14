@@ -9,13 +9,21 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { useDispatch } from "react-redux";
+import {
+  getUserInfoAction,
+  userLoginAction,
+} from "../../../redux/actions/asyncAuthAction";
 
 const Login = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [loginFormData, setLoginFormData] = useState({
-    email: "",
+    emailId: "",
     password: "",
   });
 
@@ -29,17 +37,17 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const response = await dispatch(userLoginAction(loginFormData));
-    // await dispatch(getUserInfoAction());
+    const response = await dispatch(userLoginAction(loginFormData));
 
-    // const status = response?.type?.split("/")[1];
-    // if (status === "fulfilled") {
-    //   navigate("/");
-    // }
-    setLoginFormData({
-      email: "",
-      password: "",
-    });
+    const status = response?.type?.split("/")[1];
+    if (status === "fulfilled") {
+      await dispatch(getUserInfoAction());
+      router.push("/home");
+      setLoginFormData({
+        emailId: "",
+        password: "",
+      });
+    }
   };
 
   return (
@@ -89,8 +97,8 @@ const Login = () => {
           >
             <Typography variant="h6">Email</Typography>
             <OutlinedInput
-              id="email"
-              name="email"
+              id="emailId"
+              name="emailId"
               fullWidth
               onChange={handleChange}
               startAdornment={
